@@ -88,7 +88,8 @@ elif [[ "${1}" == "test" ]]; then
   # We don't test compute-sanitizer on CTK<12 because backporting fixes is too much effort
   # We only test compute-sanitizer on python 3.12 arbitrarily; we don't need to use sanitizer on the entire matrix
   # Only local ctk installs have compute-sanitizer; there is no wheel for it
-  if [[ "${PY_VER}" == "3.12" && "${CUDA_VER}" != "11.8.0" && "${LOCAL_CTK}" == 1 && "${HOST_PLATFORM}" == linux* ]]; then
+  # Restrict to CUDA 13.x+: compute-sanitizer 12.9 hangs under the r595 driver
+  if [[ "${PY_VER}" == "3.12" && "${TEST_CUDA_MAJOR}" -ge 13 && "${LOCAL_CTK}" == 1 && "${HOST_PLATFORM}" == linux* ]]; then
     echo "LATEST_CUDA_VERSION=$(bash ci/tools/guess_latest.sh $TEST_CUDA_MAJOR)" >> $GITHUB_ENV
     SETUP_SANITIZER=1
   else
