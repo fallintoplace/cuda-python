@@ -24699,8 +24699,16 @@ cdef class CUcheckpointRestoreArgs_st:
     gpuPairsCount : unsigned int
         Number of gpu pairs to remap
     {{endif}}
-    {{if 'CUcheckpointRestoreArgs_st.reserved' in found_struct}}
+    {{if struct_field_types.get('CUcheckpointRestoreArgs_st.reserved') == 'char'}}
     reserved : bytes
+        Reserved for future use, must be zeroed
+    {{endif}}
+    {{if struct_field_types.get('CUcheckpointRestoreArgs_st.reserved') == 'cuuint64_t'}}
+    reserved : list[cuuint64_t]
+        Reserved for future use, must be zeroed
+    {{endif}}
+    {{if 'CUcheckpointRestoreArgs_st.reserved1' in found_struct}}
+    reserved1 : cuuint64_t
         Reserved for future use, must be zeroed
     {{endif}}
 
@@ -24716,6 +24724,9 @@ cdef class CUcheckpointRestoreArgs_st:
             self._pvt_ptr = <cydriver.CUcheckpointRestoreArgs_st *>_ptr
     def __init__(self, void_ptr _ptr = 0):
         pass
+        {{if 'CUcheckpointRestoreArgs_st.reserved1' in found_struct}}
+        self._reserved1 = cuuint64_t(_ptr=<void_ptr>&self._pvt_ptr[0].reserved1)
+        {{endif}}
     def __dealloc__(self):
         pass
         {{if 'CUcheckpointRestoreArgs_st.gpuPairs' in found_struct}}
@@ -24745,6 +24756,12 @@ cdef class CUcheckpointRestoreArgs_st:
                 str_list += ['reserved : ' + str(self.reserved)]
             except ValueError:
                 str_list += ['reserved : <ValueError>']
+            {{endif}}
+            {{if 'CUcheckpointRestoreArgs_st.reserved1' in found_struct}}
+            try:
+                str_list += ['reserved1 : ' + str(self.reserved1)]
+            except ValueError:
+                str_list += ['reserved1 : <ValueError>']
             {{endif}}
             return '\n'.join(str_list)
         else:
@@ -24781,14 +24798,14 @@ cdef class CUcheckpointRestoreArgs_st:
     def gpuPairsCount(self, unsigned int gpuPairsCount):
         self._pvt_ptr[0].gpuPairsCount = gpuPairsCount
     {{endif}}
-    {{if 'CUcheckpointRestoreArgs_st.reserved' in found_struct}}
+    {{if struct_field_types.get('CUcheckpointRestoreArgs_st.reserved') == 'char'}}
     @property
     def reserved(self):
-        return PyBytes_FromStringAndSize(self._pvt_ptr[0].reserved, 52)
+        return PyBytes_FromStringAndSize(self._pvt_ptr[0].reserved, {{struct_field_array_lengths['CUcheckpointRestoreArgs_st.reserved']}})
     @reserved.setter
     def reserved(self, reserved):
-        if len(reserved) != 52:
-            raise ValueError("reserved length must be 52, is " + str(len(reserved)))
+        if len(reserved) != {{struct_field_array_lengths['CUcheckpointRestoreArgs_st.reserved']}}:
+            raise ValueError("reserved length must be {{struct_field_array_lengths['CUcheckpointRestoreArgs_st.reserved']}}, is " + str(len(reserved)))
         if CHAR_MIN == 0:
             for i, b in enumerate(reserved):
                 if b < 0 and b > -129:
@@ -24799,6 +24816,33 @@ cdef class CUcheckpointRestoreArgs_st:
                 if b > 127 and b < 256:
                     b = b - 256
                 self._pvt_ptr[0].reserved[i] = b
+    {{endif}}
+    {{if struct_field_types.get('CUcheckpointRestoreArgs_st.reserved') == 'cuuint64_t'}}
+    @property
+    def reserved(self):
+        return [cuuint64_t(init_value=_reserved) for _reserved in self._pvt_ptr[0].reserved]
+    @reserved.setter
+    def reserved(self, reserved):
+        self._pvt_ptr[0].reserved = reserved
+
+    {{endif}}
+    {{if 'CUcheckpointRestoreArgs_st.reserved1' in found_struct}}
+    @property
+    def reserved1(self):
+        return self._reserved1
+    @reserved1.setter
+    def reserved1(self, reserved1):
+        cdef cydriver.cuuint64_t cyreserved1
+        if reserved1 is None:
+            cyreserved1 = <cydriver.cuuint64_t><void_ptr>0
+        elif isinstance(reserved1, (cuuint64_t)):
+            preserved1 = int(reserved1)
+            cyreserved1 = <cydriver.cuuint64_t><void_ptr>preserved1
+        else:
+            preserved1 = int(cuuint64_t(reserved1))
+            cyreserved1 = <cydriver.cuuint64_t><void_ptr>preserved1
+        self._reserved1._pvt_ptr[0] = cyreserved1
+
     {{endif}}
 {{endif}}
 {{if 'CUcheckpointUnlockArgs_st' in found_struct}}
@@ -59981,4 +60025,3 @@ cdef int _add_native_handle_getters() except?-1:
     {{endif}}
     return 0
 _add_native_handle_getters()
-
