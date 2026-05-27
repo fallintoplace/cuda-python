@@ -5089,6 +5089,37 @@ cdef class CUcheckpointCheckpointArgs_st:
     cdef cydriver.CUcheckpointCheckpointArgs_st _pvt_val
     cdef cydriver.CUcheckpointCheckpointArgs_st* _pvt_ptr
 {{endif}}
+{{if 'CUcheckpointGpuPair_st' in found_struct}}
+
+cdef class CUcheckpointGpuPair_st:
+    """
+    CUDA checkpoint GPU UUID pairs for device remapping during restore
+
+    Attributes
+    ----------
+    {{if 'CUcheckpointGpuPair_st.oldUuid' in found_struct}}
+    oldUuid : CUuuid
+        UUID of the GPU that was checkpointed
+    {{endif}}
+    {{if 'CUcheckpointGpuPair_st.newUuid' in found_struct}}
+    newUuid : CUuuid
+        UUID of the GPU to restore onto
+    {{endif}}
+
+    Methods
+    -------
+    getPtr()
+        Get memory address of class instance
+    """
+    cdef cydriver.CUcheckpointGpuPair_st _pvt_val
+    cdef cydriver.CUcheckpointGpuPair_st* _pvt_ptr
+    {{if 'CUcheckpointGpuPair_st.oldUuid' in found_struct}}
+    cdef CUuuid _oldUuid
+    {{endif}}
+    {{if 'CUcheckpointGpuPair_st.newUuid' in found_struct}}
+    cdef CUuuid _newUuid
+    {{endif}}
+{{endif}}
 {{if 'CUcheckpointRestoreArgs_st' in found_struct}}
 
 cdef class CUcheckpointRestoreArgs_st:
@@ -5097,8 +5128,25 @@ cdef class CUcheckpointRestoreArgs_st:
 
     Attributes
     ----------
-    {{if 'CUcheckpointRestoreArgs_st.reserved' in found_struct}}
+    {{if 'CUcheckpointRestoreArgs_st.gpuPairs' in found_struct}}
+    gpuPairs : CUcheckpointGpuPair
+        Pointer to array of gpu pairs that indicate how to remap GPUs
+        during restore
+    {{endif}}
+    {{if 'CUcheckpointRestoreArgs_st.gpuPairsCount' in found_struct}}
+    gpuPairsCount : unsigned int
+        Number of gpu pairs to remap
+    {{endif}}
+    {{if struct_field_types.get('CUcheckpointRestoreArgs_st.reserved') == 'char'}}
+    reserved : bytes
+        Reserved for future use, must be zeroed
+    {{endif}}
+    {{if struct_field_types.get('CUcheckpointRestoreArgs_st.reserved') == 'cuuint64_t'}}
     reserved : list[cuuint64_t]
+        Reserved for future use, must be zeroed
+    {{endif}}
+    {{if 'CUcheckpointRestoreArgs_st.reserved1' in found_struct}}
+    reserved1 : cuuint64_t
         Reserved for future use, must be zeroed
     {{endif}}
 
@@ -5109,6 +5157,13 @@ cdef class CUcheckpointRestoreArgs_st:
     """
     cdef cydriver.CUcheckpointRestoreArgs_st _pvt_val
     cdef cydriver.CUcheckpointRestoreArgs_st* _pvt_ptr
+    {{if 'CUcheckpointRestoreArgs_st.gpuPairs' in found_struct}}
+    cdef size_t _gpuPairs_length
+    cdef cydriver.CUcheckpointGpuPair* _gpuPairs
+    {{endif}}
+    {{if 'CUcheckpointRestoreArgs_st.reserved1' in found_struct}}
+    cdef cuuint64_t _reserved1
+    {{endif}}
 {{endif}}
 {{if 'CUcheckpointUnlockArgs_st' in found_struct}}
 
@@ -10552,6 +10607,30 @@ cdef class CUcheckpointCheckpointArgs(CUcheckpointCheckpointArgs_st):
     """
     pass
 {{endif}}
+{{if 'CUcheckpointGpuPair' in found_types}}
+
+cdef class CUcheckpointGpuPair(CUcheckpointGpuPair_st):
+    """
+    CUDA checkpoint GPU UUID pairs for device remapping during restore
+
+    Attributes
+    ----------
+    {{if 'CUcheckpointGpuPair_st.oldUuid' in found_struct}}
+    oldUuid : CUuuid
+        UUID of the GPU that was checkpointed
+    {{endif}}
+    {{if 'CUcheckpointGpuPair_st.newUuid' in found_struct}}
+    newUuid : CUuuid
+        UUID of the GPU to restore onto
+    {{endif}}
+
+    Methods
+    -------
+    getPtr()
+        Get memory address of class instance
+    """
+    pass
+{{endif}}
 {{if 'CUcheckpointRestoreArgs' in found_types}}
 
 cdef class CUcheckpointRestoreArgs(CUcheckpointRestoreArgs_st):
@@ -10560,8 +10639,25 @@ cdef class CUcheckpointRestoreArgs(CUcheckpointRestoreArgs_st):
 
     Attributes
     ----------
-    {{if 'CUcheckpointRestoreArgs_st.reserved' in found_struct}}
+    {{if 'CUcheckpointRestoreArgs_st.gpuPairs' in found_struct}}
+    gpuPairs : CUcheckpointGpuPair
+        Pointer to array of gpu pairs that indicate how to remap GPUs
+        during restore
+    {{endif}}
+    {{if 'CUcheckpointRestoreArgs_st.gpuPairsCount' in found_struct}}
+    gpuPairsCount : unsigned int
+        Number of gpu pairs to remap
+    {{endif}}
+    {{if struct_field_types.get('CUcheckpointRestoreArgs_st.reserved') == 'char'}}
+    reserved : bytes
+        Reserved for future use, must be zeroed
+    {{endif}}
+    {{if struct_field_types.get('CUcheckpointRestoreArgs_st.reserved') == 'cuuint64_t'}}
     reserved : list[cuuint64_t]
+        Reserved for future use, must be zeroed
+    {{endif}}
+    {{if 'CUcheckpointRestoreArgs_st.reserved1' in found_struct}}
+    reserved1 : cuuint64_t
         Reserved for future use, must be zeroed
     {{endif}}
 
